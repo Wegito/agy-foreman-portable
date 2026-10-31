@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+*.tgz
+package/
+test/.tmp/
+reports/
+
+# Portable launcher
+.runtime/
