@@ -29,7 +29,10 @@ const die = (s) => {
 };
 
 const major = Number(process.versions.node.split(".")[0]);
-if (major < 20) die(`Node 20 or newer is needed (this is ${process.versions.node}). Use the agy-foreman launcher, which installs it for you.`);
+if (major < 20)
+  die(
+    `Node 20 or newer is needed (this is ${process.versions.node}). Use the agy-foreman launcher, which installs it for you.`,
+  );
 
 /** Quotes an argument for cmd.exe, where npm and claude are .cmd files that need a shell. */
 const q = (a) => (IS_WIN && /[\s&()^]/.test(a) ? `"${a}"` : a);
@@ -50,13 +53,20 @@ const hashOf = (f) => {
 function ensureBuilt(force) {
   const stamp = `${hashOf(path.join(ROOT, "package-lock.json"))}:node${major}`;
   const current = existsSync(STAMP) ? readFileSync(STAMP, "utf8") : "";
-  if (!force && existsSync(ENTRY) && current === stamp && existsSync(path.join(ROOT, "node_modules"))) return;
+  if (
+    !force &&
+    existsSync(ENTRY) &&
+    current === stamp &&
+    existsSync(path.join(ROOT, "node_modules"))
+  )
+    return;
   step("First-time setup: installing parts (a minute or two, once)…");
   let r = run("npm", ["ci", "--no-audit", "--no-fund"], { cwd: ROOT });
   if (r.status !== 0) {
     warn("npm ci failed; trying npm install");
     r = run("npm", ["install", "--no-audit", "--no-fund"], { cwd: ROOT });
-    if (r.status !== 0) die("Could not install dependencies. Check your internet connection and try again.");
+    if (r.status !== 0)
+      die("Could not install dependencies. Check your internet connection and try again.");
   }
   step("Building agy-foreman…");
   if (run("npm", ["run", "build"], { cwd: ROOT }).status !== 0) die("Build failed.");
@@ -72,26 +82,52 @@ function cli(argv, cwd = CALLER_CWD) {
 function setup() {
   ensureBuilt(false);
   step("Installing the Claude skill that teaches Claude to delegate…");
-  if (cli(["install-skill"], ROOT) !== 0) warn("Could not install the skill; you can retry with: agy-foreman install-skill");
+  if (cli(["install-skill"], ROOT) !== 0)
+    warn("Could not install the skill; you can retry with: agy-foreman install-skill");
 
   if (has("claude")) {
     step("Registering agy-foreman with Claude Code (for all your projects)…");
     run("claude", ["mcp", "remove", "agy-foreman", "--scope", "user"], { stdio: "ignore" });
-    const r = run("claude", ["mcp", "add", "--scope", "user", "agy-foreman", "--", process.execPath, ENTRY, "serve"]);
+    const r = run("claude", [
+      "mcp",
+      "add",
+      "--scope",
+      "user",
+      "agy-foreman",
+      "--",
+      process.execPath,
+      ENTRY,
+      "serve",
+    ]);
     if (r.status === 0) ok("Registered");
-    else warn("Registration failed. Register by hand:\n  claude mcp add --scope user agy-foreman -- " + [q(process.execPath), q(ENTRY), "serve"].join(" "));
+    else
+      warn(
+        "Registration failed. Register by hand:\n  claude mcp add --scope user agy-foreman -- " +
+          [q(process.execPath), q(ENTRY), "serve"].join(" "),
+      );
   } else {
-    warn("Claude Code was not found (https://claude.com/claude-code). Once installed, register agy-foreman with:\n  claude mcp add --scope user agy-foreman -- " + [q(process.execPath), q(ENTRY), "serve"].join(" "));
+    warn(
+      "Claude Code was not found (https://claude.com/claude-code). Once installed, register agy-foreman with:\n  claude mcp add --scope user agy-foreman -- " +
+        [q(process.execPath), q(ENTRY), "serve"].join(" "),
+    );
   }
   if (!has("git")) warn("git was not found: https://git-scm.com/downloads");
-  if (!has("agy")) warn("The Antigravity CLI (agy) was not found. Install it and sign in to your Google account: https://antigravity.google/docs/cli");
+  if (!has("agy"))
+    warn(
+      "The Antigravity CLI (agy) was not found. Install it and sign in to your Google account: https://antigravity.google/docs/cli",
+    );
 
   say();
   ok("Setup done. Next:");
   say("  1. Restart Claude Code.");
-  say("  2. In each project you want to use it in, open a terminal there and run:  " + c(1, "agy-foreman init"));
-  say("     (use the agy-foreman file from this folder, or run  agy-foreman doctor  to check your setup)");
-  say("  3. Ask Claude: \"Run task 1 of docs/plan.md with Gemini.\"");
+  say(
+    "  2. In each project you want to use it in, open a terminal there and run:  " +
+      c(1, "agy-foreman init"),
+  );
+  say(
+    "     (use the agy-foreman file from this folder, or run  agy-foreman doctor  to check your setup)",
+  );
+  say('  3. Ask Claude: "Run task 1 of docs/plan.md with Gemini."');
   say();
   say("If you move this folder, run setup again so Claude Code finds the new location.");
 }
