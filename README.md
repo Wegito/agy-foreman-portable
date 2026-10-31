@@ -14,7 +14,7 @@ curl -fsSL https://raw.githubusercontent.com/Wegito/agy-foreman-portable/main/in
 
 It puts agy-foreman in `~/agy-foreman` and runs the setup. Works on Apple Silicon and Intel Macs.
 
-**Windows:** download this repository (green **Code** button → _Download ZIP_), unzip it anywhere, and double-click **`setup.bat`**.
+**Windows:** download `agy-foreman-portable.zip` from the [latest release](https://github.com/Wegito/agy-foreman-portable/releases/latest), unzip it anywhere, and double-click **`setup.bat`**.
 
 **Prefer a downloaded folder on a Mac?** Run `bash setup.command` in Terminal from inside the folder. (A ZIP download from GitHub drops the "executable" flag and macOS flags downloaded scripts as unverified, so double-clicking may be refused; the one-line install above avoids both.)
 
