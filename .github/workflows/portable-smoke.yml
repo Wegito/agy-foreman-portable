@@ -1,0 +1,50 @@
+name: portable-smoke
+# Proves the one-folder launcher works on a computer with no Node.js: downloads a private Node,
+# builds, runs setup, and runs a CLI command from a project folder.
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  unix:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, macos-15-intel, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup with no system Node on PATH
+        run: |
+          chmod +x agy-foreman
+          env PATH=/usr/bin:/bin:/usr/sbin:/sbin ./agy-foreman setup | tee setup.log
+          grep -q "Setup done" setup.log
+          test -x .runtime/node/bin/node
+      - name: doctor reports Node
+        run: |
+          env PATH=/usr/bin:/bin:/usr/sbin:/sbin ./agy-foreman doctor | tee doctor.log || true
+          grep -q "✓ node" doctor.log
+      - name: init from a project folder
+        run: |
+          mkdir "$RUNNER_TEMP/proj" && cd "$RUNNER_TEMP/proj" && git init -q .
+          env PATH=/usr/bin:/bin:/usr/sbin:/sbin "$GITHUB_WORKSPACE/agy-foreman" init
+          test -f .agy-foreman.json
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup with no system Node on PATH
+        shell: cmd
+        run: |
+          set PATH=C:\Windows\System32;C:\Windows;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Program Files\Git\cmd
+          call agy-foreman.bat setup
+          if not exist .runtime\node\node.exe exit /b 1
+      - name: init from a project folder
+        shell: cmd
+        run: |
+          set PATH=C:\Windows\System32;C:\Windows;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Program Files\Git\cmd
+          mkdir "%RUNNER_TEMP%\proj"
+          cd /d "%RUNNER_TEMP%\proj"
+          git init -q .
+          call "%GITHUB_WORKSPACE%\agy-foreman.bat" init
+          if not exist .agy-foreman.json exit /b 1

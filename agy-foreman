@@ -33,6 +33,12 @@ if [ -z "$NODE" ]; then
   mkdir -p "$RUNTIME"
   tar -xzf "$tmp/node.tar.gz" -C "$RUNTIME" --strip-components=1
   NODE="$RUNTIME/bin/node"
+  if ! "$NODE" --version >/dev/null 2>&1; then
+    rm -rf "$RUNTIME"
+    echo "The downloaded Node.js does not run on this computer (macOS older than 13.5?)."
+    echo "Install Node.js 20+ from https://nodejs.org (an older release if your macOS is old) and run this again."
+    exit 1
+  fi
 fi
 
 export PATH="$(dirname "$NODE"):$PATH"

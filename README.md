@@ -6,13 +6,21 @@ This is [agy-foreman](https://github.com/mountaser/agy-foreman) packaged as **on
 
 ## Set it up (once)
 
-| Your computer | Do this |
-| --- | --- |
-| **Windows** | Double-click **`setup.bat`** |
-| **macOS** | Double-click **`setup.command`** (first time: right-click → Open) |
-| **Linux** | Run **`./agy-foreman setup`** in a terminal |
+**macOS and Linux: one line.** Open Terminal (on a Mac: press Cmd+Space, type "Terminal") and paste:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Wegito/agy-foreman-portable/main/install.sh | bash
+```
+
+It puts agy-foreman in `~/agy-foreman` and runs the setup. Works on Apple Silicon and Intel Macs.
+
+**Windows:** download this repository (green **Code** button → *Download ZIP*), unzip it anywhere, and double-click **`setup.bat`**.
+
+**Prefer a downloaded folder on a Mac?** Run `bash setup.command` in Terminal from inside the folder. (A ZIP download from GitHub drops the "executable" flag and macOS flags downloaded scripts as unverified, so double-clicking may be refused; the one-line install above avoids both.)
 
 Setup takes a minute or two. It fetches a private copy of Node.js if your computer has none, builds agy-foreman, installs the Claude skill, and registers agy-foreman with Claude Code for all your projects. Then **restart Claude Code**.
+
+macOS 13.5 or newer is needed for the built-in Node. On an older Mac, install Node.js 20+ from https://nodejs.org first and setup will use that.
 
 ## Use it in a project
 
@@ -33,7 +41,7 @@ Run `agy-foreman doctor` any time: it checks Node, git and your `agy` login and 
 
 ## Commands
 
-Run them as `./agy-foreman <command>` (macOS/Linux) or `agy-foreman.bat <command>` (Windows). They run in the folder you are in.
+Run them as `~/agy-foreman/agy-foreman <command>` (macOS/Linux; add the folder to your PATH to type just `agy-foreman`) or `agy-foreman.bat <command>` (Windows). They run in the folder you are in.
 
 | Command | What it does |
 | --- | --- |
